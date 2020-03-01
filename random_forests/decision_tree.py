@@ -1,14 +1,25 @@
 import numpy as np
-from tree_node import TreeNode
+from random_forests.tree_node import TreeNode
 
 class DecisionTree:
     def __init__(self):
         self.root = TreeNode()
+        self.training_samples_root = None
+        self.attributes_list = []
         
     def set_root(self,_tree_node):
         pass
 
-    def generate_decision_tree(_training_samples, _attributes_list):
+    def set_training_samples_root(self,_training_samples):
+        self.training_samples_root = _training_samples
+
+    def set_attributes_list(self,_attributes_list):
+        self.attributes_list = _attributes_list
+
+    def get_all_possible_values_on_attribute(self,_target_attribute):
+        return list(set(self.training_samples_root[:,_target_attribute].tolist()))
+
+    def generate_decision_tree(self,_training_samples, _attributes_list):
         tree_node = TreeNode()
         tree_node.set_samples(_training_samples)
         tree_node.set_attribute_list(_attributes_list)
@@ -30,10 +41,14 @@ class DecisionTree:
         # set the target split attribute
         tree_node.set_target_attribute(best_attribute_to_split)
 
-        # TODO: get_all_possible_values_on_attribute
+        attribute_values_samples_mapping_dict = tree_node.split_by_attribute_internal(best_attribute_to_split)
         for possible_value in self.get_all_possible_values_on_attribute(best_attribute_to_split):
             sub_tree_node = TreeNode()
-            sub_training_samples = tree_node.split_by_attribute(possible_value)
+            #sub_training_samples = tree_node.split_by_attribute(possible_value)
+            if possible_value in attribute_values_samples_mapping_dict:
+                sub_training_samples = attribute_values_samples_mapping_dict[possible_value]
+            else:
+                sub_training_samples = np.zeros((0,0))
 
             if sub_training_samples.shape[0] == 0:
                 sub_tree_node.set_samples(sub_training_samples)
@@ -42,8 +57,9 @@ class DecisionTree:
                 tree_node.add_child_node(sub_tree_node)
                 return tree_node
             else:
-                _attributes_list.remove(best_attribute_to_split)
-                tree_node.add_child_node(generate_decision_tree(sub_training_samples,_attributes_list))
+                _attributes_list_cp = _attributes_list[:]
+                _attributes_list_cp.remove(best_attribute_to_split)
+                tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp))
         
         return tree_node
 
