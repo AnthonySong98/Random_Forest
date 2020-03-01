@@ -8,7 +8,7 @@ class DecisionTree:
         self.attributes_list = []
         
     def set_root(self,_tree_node):
-        pass
+        self.root = _tree_node
 
     def set_training_samples_root(self,_training_samples):
         self.training_samples_root = _training_samples
@@ -54,11 +54,13 @@ class DecisionTree:
                 sub_tree_node.set_samples(sub_training_samples)
                 sub_tree_node.set_is_leaf(True)
                 sub_tree_node.set_category(tree_node.get_label_of_most_frequent_samples())
+                tree_node.add_child_node_criterion(possible_value)
                 tree_node.add_child_node(sub_tree_node)
                 return tree_node
             else:
                 _attributes_list_cp = _attributes_list[:]
                 _attributes_list_cp.remove(best_attribute_to_split)
+                tree_node.add_child_node_criterion(possible_value)
                 tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp))
         
         return tree_node

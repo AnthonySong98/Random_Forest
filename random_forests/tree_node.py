@@ -10,6 +10,7 @@ class TreeNode:
         self.metrics = "Geni index"
         self.is_leaf = False
         self.child_node_list = []
+        self.child_node_criterion_list = []
 
     def set_samples(self,_samples):
         self.samples = _samples
@@ -109,4 +110,7 @@ class TreeNode:
 
     def add_child_node(self,_tree_node):
         self.child_node_list.append(_tree_node)
+
+    def add_child_node_criterion(self,_feature_criterion):
+        self.child_node_criterion_list.append(_feature_criterion)
     
