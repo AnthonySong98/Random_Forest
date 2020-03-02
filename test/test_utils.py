@@ -12,8 +12,9 @@ class TestVisTree(unittest.TestCase):
         test_decision_tree.set_attributes_list(list(range(test_dataset.num_features)))
         decision_tree_root = test_decision_tree.generate_decision_tree(test_decision_tree.training_samples_root,test_decision_tree.attributes_list)
         test_decision_tree.set_root(decision_tree_root)
-        test_vis_tree = VisTree(test_decision_tree,test_dataset.feature2number_mapping,test_dataset.feature_name_list)
-        test_vis_tree.vis_tree()
+        test_vis_tree = VisTree(test_decision_tree,test_dataset.feature2number_mapping,\
+            test_dataset.feature_name_list,_tree_name="test_decision_tree")
+        test_vis_tree.vis_tree(mode=1)
         self.assertEqual(1,2-1)
 
 if __name__ == '__main__':

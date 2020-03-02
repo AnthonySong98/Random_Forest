@@ -1,7 +1,7 @@
 from __future__ import print_function
 import pandas as pd
 import numpy as np
-
+import os
 from random_forests.decision_tree import DecisionTree
 from random_forests.tree_node import TreeNode
 
@@ -61,42 +61,102 @@ class Dataset:
 
 
 class VisTree:
-    def __init__(self,_decision_tree, _feature2number_mapping, _feature_name_list):
+    def __init__(self,_decision_tree, _feature2number_mapping, _feature_name_list, _tree_name):
         self.tree_root = _decision_tree.root
         self.number2feature_mapping = [dict(zip(i_dict.values(),i_dict.keys())) for i_dict in _feature2number_mapping]
         self.feature_name_list = _feature_name_list
+        self.tree_name = _tree_name
     
     def print_node(self,_temp_node):
+        '''
+        print node info to console
+        '''
         print("leaf ? ",_temp_node.is_leaf)
-        print("attribute_list : ",[self.feature_name_list[i] for i in _temp_node.attribute_list])
-        print("target_attribute : ",self.feature_name_list[_temp_node.target_attribute])
-        print("child_node_criterion_list : ",[self.number2feature_mapping[_temp_node.target_attribute][i] for i in _temp_node.child_node_criterion_list])
+        # print("attribute_list : ",[self.feature_name_list[i] for i in _temp_node.attribute_list])
+        # print("target_attribute : ",self.feature_name_list[_temp_node.target_attribute])
+        # print("child_node_criterion_list : ",[self.number2feature_mapping[_temp_node.target_attribute][i] for i in _temp_node.child_node_criterion_list])
         print("samples : ",_temp_node.samples.shape)
         if _temp_node.is_leaf == True:
             print("Category : ", _temp_node.category)
+        else:
+            print("attribute_list : ",[self.feature_name_list[i] for i in _temp_node.attribute_list])
+            print("target_attribute : ",self.feature_name_list[_temp_node.target_attribute])
+            print("child_node_criterion_list : ",[self.number2feature_mapping[_temp_node.target_attribute][i] for i in _temp_node.child_node_criterion_list])
 
+    def dot4node(self,_temp_node,_node_idx):
+        '''
+        generate dot file for node
+        '''
+        if _temp_node.is_leaf:
+            return ("node_%d [shape = ellipse,label= \"category: %s\\nsamples: %d\"];\n" %(_node_idx,_temp_node.category,(_temp_node.samples.shape[0])))
+        else:
+            return ("node_%d [shape = box,label= \"target attribute: %s ?\\nsamples: %d\"];\n"%(_node_idx,self.feature_name_list[_temp_node.target_attribute],(_temp_node.samples.shape[0])))
 
-    def vis_tree(self):
-        helper_queue = []
-        temp_node = self.tree_root
-        while temp_node is not None:
-            print('==============================================================')
-            self.print_node(temp_node)
-            # print("leaf ? ",temp_node.is_leaf)
-            # print("attribute_list : ",temp_node.attribute_list)
-            # print("target_attribute : ",temp_node.target_attribute)
-            # print("child_node_criterion_list : ",temp_node.child_node_criterion_list)
-            # print("samples : ",temp_node.samples.shape)
-            # if temp_node.is_leaf == True:
-            #     print("Category : ", temp_node.category)
-            
-            for child_node in temp_node.child_node_list:
-                helper_queue.append(child_node)
+    def dot4edge(self,node1_idx,node2_idx,label_content):
+        '''
+        generate dot file for edge from node1 to node2 with label_content
+        '''
+        return ("node_%d -> node_%d [label=\"%s\"];\n"%(node1_idx,node2_idx,str(label_content)))
 
-            if len(helper_queue) > 0 :
-                temp_node = helper_queue.pop(0)
-            else:
-                temp_node = None
+    def vis_tree(self,mode = 0):
+        if mode == 0:
 
+            helper_queue = []
 
+            current_node_idx = 0
+            helper_queue.append((self.tree_root,current_node_idx))
+
+            print("Node ",current_node_idx)
+            self.print_node(self.tree_root)
+
+            node_idx = 0
+            while len(helper_queue) > 0:
+                print('==============================================================')
+
+                temp_node,current_node_idx = helper_queue.pop(0)
+
+                current_node_child_id = 0
+                for child_node in temp_node.child_node_list:
+                    node_idx += 1
+                    print()
+                    print("Node ",node_idx)
+                    self.print_node(child_node)
+                    helper_queue.append((child_node,node_idx))
+
+                    print("Node ", current_node_idx , " ---> " ,node_idx)
+                    print("Attribute vaule ", self.number2feature_mapping[temp_node.target_attribute][temp_node.child_node_criterion_list[current_node_child_id]])
+                    current_node_child_id += 1
+
+        if mode == 1 :
+
+            f = open("./vis/dot_files/%s.gv" %(self.tree_name),"w")
+
+            f.write("digraph %s {\n" %(self.tree_name))
+            helper_queue = []
+
+            current_node_idx = 0
+            helper_queue.append((self.tree_root,current_node_idx))
+
+            f.write(self.dot4node(self.tree_root,current_node_idx))
+
+            node_idx = 0
+            while len(helper_queue) > 0:
+
+                temp_node,current_node_idx = helper_queue.pop(0)
+
+                current_node_child_id = 0
+                for child_node in temp_node.child_node_list:
+                    node_idx += 1
+
+                    f.write(self.dot4node(child_node,node_idx))
+                    helper_queue.append((child_node,node_idx))
+                    f.write(self.dot4edge(current_node_idx,node_idx,\
+                        str(self.number2feature_mapping[temp_node.target_attribute][temp_node.child_node_criterion_list[current_node_child_id]])))
+
+                    current_node_child_id += 1
+
+            f.write("}\n")
+            f.close()
+
+            os.system("dot -Tpdf ./vis/dot_files/%s.gv -o ./vis/pdf_files/%s.pdf" %(self.tree_name,self.tree_name))
 
