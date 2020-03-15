@@ -47,7 +47,7 @@ class TreeNode:
         if len(self.attribute_list) == 0:
             return True
         for attribute_index in self.attribute_list:
-            if len(set(self.samples[:,attribute_index].tolist())) != 1:
+            if len(set(self.samples[:,attribute_index[0]].tolist())) != 1:
                 flag = False
                 break
         return flag
@@ -73,14 +73,68 @@ class TreeNode:
 
     def split_by_attribute_internal(self,_potential_attribute):
         attribute_values_samples_mapping_dict = {}
-        for sample_index in range(self.samples.shape[0]):
-            if self.samples[sample_index][_potential_attribute] in attribute_values_samples_mapping_dict:
-                attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute]] = \
-                np.concatenate((attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute]],\
-                self.samples[sample_index,:].reshape(1,-1)), axis = 0)
-            else:
-                attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute]] = \
-                self.samples[sample_index,:].reshape(1,-1)
+        # discrete case
+        if _potential_attribute[1] == 0:
+            for sample_index in range(self.samples.shape[0]):
+                if self.samples[sample_index][_potential_attribute[0]] in attribute_values_samples_mapping_dict:
+                    attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute[0]]] = \
+                    np.concatenate((attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute[0]]],\
+                    self.samples[sample_index,:].reshape(1,-1)), axis = 0)
+                else:
+                    attribute_values_samples_mapping_dict[self.samples[sample_index][_potential_attribute[0]]] = \
+                    self.samples[sample_index,:].reshape(1,-1)
+        # continuous case
+        if _potential_attribute[1] == 1:
+            A = (self.samples[:,_potential_attribute[0]]).tolist()
+            A.sort()
+            T_a = [(A[i] + A[i+1]) / 2.0  for i in range(len(A)-1)]
+            potential_split_value_dict_list = []
+            potential_split_value_dict = {}
+            for split_value in T_a:
+                
+                # first is <= ,second is >
+                potential_split_value_dict[split_value] = []
+                D_minus = None
+                D_minus_flag = True
+                D_plus = None
+                D_plus_flag = True
+                for sample_index in range(self.samples.shape[0]):
+                    if self.samples[sample_index][_potential_attribute[0]] <= split_value:
+                        if D_minus_flag:
+                            D_minus = self.samples[sample_index,:].reshape(1,-1)
+                            D_minus_flag = False
+                        else:
+                            D_minus = np.concatenate((D_minus,self.samples[sample_index,:].reshape(1,-1)),axis=0)
+                    else:
+                        if D_plus_flag:
+                            D_plus = self.samples[sample_index,:].reshape(1,-1)
+                            D_plus_flag = False
+                        else:
+                            D_plus = np.concatenate((D_plus,self.samples[sample_index,:].reshape(1,-1)),axis=0)
+                potential_split_value_dict[split_value].append(D_minus)
+                potential_split_value_dict[split_value].append(D_plus)
+                Gain_D_a = self.get_ent(self.samples) - (float) (D_minus.shape[0]) / self.samples.shape[0] * self.get_ent(D_minus) \
+                     - (float) (D_plus.shape[0]) / self.samples.shape[0] * self.get_ent(D_plus)
+                potential_split_value_dict[split_value].append(Gain_D_a)
+                # potential_split_value_dict_list.append(potential_split_value_dict)
+
+            cnt = 0
+            for split_value,split_value_result in potential_split_value_dict.items():
+                if cnt == 0 :
+                    max_split_value_result = split_value_result[2]
+                    max_split_value = split_value
+                    cnt += 1
+                    continue
+                if split_value_result[2] > max_split_value_result:
+                    max_split_value_result = split_value_result[2]
+                    max_split_value = split_value
+                    cnt += 1
+            
+            attribute_values_samples_mapping_dict["<="+str(max_split_value)] = potential_split_value_dict[max_split_value][0]
+            attribute_values_samples_mapping_dict[">"+str(max_split_value)] = potential_split_value_dict[max_split_value][1]
+            # print("end")    
+
+
         return attribute_values_samples_mapping_dict
         
 
