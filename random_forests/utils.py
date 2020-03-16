@@ -134,7 +134,7 @@ class VisTree:
         if _temp_node.is_leaf:
             return ("node_%d [shape = ellipse,label= \"category: %s\\nsamples: %d\"];\n" %(_node_idx,_temp_node.category,(_temp_node.samples.shape[0])))
         else:
-            return ("node_%d [shape = box,label= \"target attribute: %s ?\\nsamples: %d\"];\n"%(_node_idx,self.feature_name_list[_temp_node.target_attribute],(_temp_node.samples.shape[0])))
+            return ("node_%d [shape = box,label= \"target attribute: %s ?\\nsamples: %d\"];\n"%(_node_idx,self.feature_name_list[_temp_node.target_attribute[0]],(_temp_node.samples.shape[0])))
 
     def dot4edge(self,node1_idx,node2_idx,label_content):
         '''
@@ -194,8 +194,12 @@ class VisTree:
 
                     f.write(self.dot4node(child_node,node_idx))
                     helper_queue.append((child_node,node_idx))
-                    f.write(self.dot4edge(current_node_idx,node_idx,\
-                        str(self.number2feature_mapping[temp_node.target_attribute][temp_node.child_node_criterion_list[current_node_child_id]])))
+                    if temp_node.target_attribute[1] == 0:
+                        f.write(self.dot4edge(current_node_idx,node_idx,\
+                            str(self.number2feature_mapping[temp_node.target_attribute[0]][temp_node.child_node_criterion_list[current_node_child_id]])))
+                    else:
+                        f.write(self.dot4edge(current_node_idx,node_idx,\
+                            str(temp_node.child_node_criterion_list[current_node_child_id])))
 
                     current_node_child_id += 1
 
