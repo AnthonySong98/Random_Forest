@@ -1,0 +1,17 @@
+digraph test_decision_tree_3 {
+node_0 [shape = box,label= "target attribute: Outlook ?\nsamples: 14"];
+node_1 [shape = box,label= "target attribute: Humidity ?\nsamples: 5"];
+node_0 -> node_1 [label="Sunny"];
+node_2 [shape = ellipse,label= "category: 1.0\nsamples: 4"];
+node_0 -> node_2 [label="Overcast"];
+node_3 [shape = box,label= "target attribute: Windy ?\nsamples: 5"];
+node_0 -> node_3 [label="Rainy"];
+node_4 [shape = ellipse,label= "category: 0.0\nsamples: 3"];
+node_1 -> node_4 [label="High"];
+node_5 [shape = ellipse,label= "category: 1.0\nsamples: 2"];
+node_1 -> node_5 [label="Normal"];
+node_6 [shape = ellipse,label= "category: 1.0\nsamples: 3"];
+node_3 -> node_6 [label="False"];
+node_7 [shape = ellipse,label= "category: 0.0\nsamples: 2"];
+node_3 -> node_7 [label="True"];
+}

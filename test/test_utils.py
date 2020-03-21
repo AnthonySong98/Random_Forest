@@ -32,5 +32,18 @@ class TestVisTree(unittest.TestCase):
         test_vis_tree.vis_tree(mode=1)
         self.assertEqual(1,2-1)
 
+    def test_vis_tree_3(self):
+        test_dataset = Dataset(_dataset_name = 'tennis', _dataset_file_path = './datasets/tennis.csv')
+        test_dataset.load_dataset(verbose=False)
+        test_decision_tree = DecisionTree()
+        test_decision_tree.set_training_samples_root(test_dataset.samples)
+        test_decision_tree.set_attributes_list(list(range(test_dataset.num_features)))
+        test_decision_tree.set_attributes_list([(0,0),(1,0),(2,0),(3,0)])
+        decision_tree_root = test_decision_tree.generate_decision_tree(test_decision_tree.training_samples_root,test_decision_tree.attributes_list)
+        test_decision_tree.set_root(decision_tree_root)
+        test_vis_tree = VisTree(test_decision_tree,test_dataset.feature2number_mapping,\
+            test_dataset.feature_name_list,_tree_name="test_decision_tree_3")
+        test_vis_tree.vis_tree(mode=1)
+
 if __name__ == '__main__':
     unittest.main()
