@@ -1,3 +1,5 @@
+import random
+import math
 import numpy as np
 from collections import Counter
 
@@ -138,13 +140,16 @@ class TreeNode:
         return attribute_values_samples_mapping_dict
         
 
-    def select_best_attribute_to_split(self):
-        '''
-        tricky
-        return index of attribute
-        '''
+    def select_best_attribute_to_split(self,max_features = None):
         information_gain_dict = {}
-        for potential_attribute in self.attribute_list:
+        considered_attribute_list = []
+        if max_features == None:
+            considered_attribute_list = self.attribute_list
+        else:
+            num_of_considered_attribute = math.floor(math.sqrt(len(self.attribute_list)))
+            considered_attribute_list = random.sample(self.attribute_list, num_of_considered_attribute)
+
+        for potential_attribute in considered_attribute_list:
             subsamples_list = self.split_by_attribute_internal(potential_attribute)
             sum_ent = 0
             for subsamples_key in subsamples_list:
@@ -155,11 +160,6 @@ class TreeNode:
             information_gain_on_attribute = self.get_ent(self.samples) - sum_ent
             information_gain_dict[potential_attribute] = information_gain_on_attribute
         return max(information_gain_dict, key=information_gain_dict.get)
-
-    def split_by_attribute(self, _target_attribute_index, _target_attribute_value):
-        '''
-        return sub samples
-        '''
         
 
     def add_child_node(self,_tree_node):

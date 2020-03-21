@@ -20,7 +20,7 @@ class DecisionTree:
         if _target_attribute[1] == 0:
             return list(set(self.training_samples_root[:,_target_attribute[0]].tolist()))
 
-    def generate_decision_tree(self,_training_samples, _attributes_list):
+    def generate_decision_tree(self,_training_samples, _attributes_list, random_state = None):
         tree_node = TreeNode()
         tree_node.set_samples(_training_samples)
         tree_node.set_attribute_list(_attributes_list)
@@ -37,7 +37,7 @@ class DecisionTree:
             tree_node.set_category(tree_node.get_label_of_most_frequent_samples())
             return tree_node
 
-        best_attribute_to_split = tree_node.select_best_attribute_to_split()
+        best_attribute_to_split = tree_node.select_best_attribute_to_split(max_features=random_state)
 
         # set the target split attribute
         tree_node.set_target_attribute(best_attribute_to_split)
