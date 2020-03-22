@@ -42,16 +42,17 @@ class RandomForest():
         if len(self.forest) != self.n_estimators:
             print("Random Forest genertion error!")
             return
-        correct_cnt = 0
+        error_cnt = 0
         for sample_index in self.out_of_bag_testing_samples_dict:
             test_sample = self.dataset.samples[sample_index,:]
             predicted_label_vote = []
             for decision_tree_index in self.out_of_bag_testing_samples_dict[sample_index]:
                 predicted_label_vote.append(self.forest[decision_tree_index].predict(test_sample[:-1]))
             predicted_label = Counter(predicted_label_vote).most_common(1)[0][0]
-            correct_cnt += 1
+            if predicted_label != test_sample[-1]:
+                error_cnt += 1
         
-        return  float (correct_cnt) / len(self.out_of_bag_testing_samples_dict)
+        return  float (error_cnt) / len(self.out_of_bag_testing_samples_dict)
 
                 
 

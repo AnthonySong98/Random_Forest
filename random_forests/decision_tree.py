@@ -73,7 +73,12 @@ class DecisionTree:
                 sub_training_samples = attribute_values_samples_mapping_dict[possible_criterion_value]
 
                 if sub_training_samples is None or sub_training_samples.shape[0] == 0:
-                    return None
+                    sub_tree_node.set_samples(np.zeros((0,0)))
+                    sub_tree_node.set_is_leaf(True)
+                    sub_tree_node.set_category(tree_node.get_label_of_most_frequent_samples())
+                    tree_node.add_child_node_criterion(possible_criterion_value)
+                    tree_node.add_child_node(sub_tree_node)
+                    return tree_node
                 else:
                     _attributes_list_cp = _attributes_list[:]
                     _attributes_list_cp.remove(best_attribute_to_split)
@@ -101,10 +106,13 @@ class DecisionTree:
                         child_node_index = current_tree_node.child_node_criterion_list.index(current_criterion)
                         break
             if child_node_index != -1:
+                if current_tree_node.child_node_list[child_node_index] is None:
+                    break
                 current_tree_node = current_tree_node.child_node_list[child_node_index]
             else:
                 # print("No satisfied criterion is found in tree node!")
                 break
+
         return current_tree_node.category
 
 
