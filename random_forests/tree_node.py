@@ -87,7 +87,7 @@ class TreeNode:
                     self.samples[sample_index,:].reshape(1,-1)
         # continuous case
         if _potential_attribute[1] == 1:
-            A = (self.samples[:,_potential_attribute[0]]).tolist()
+            A = list(set((self.samples[:,_potential_attribute[0]]).tolist()))
             A.sort()
             T_a = [(A[i] + A[i+1]) / 2.0  for i in range(len(A)-1)]
             potential_split_value_dict_list = []

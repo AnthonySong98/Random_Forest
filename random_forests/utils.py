@@ -15,6 +15,7 @@ class Dataset:
         self.labels = None
         self.feature2number_mapping = []
         self.feature_name_list = []
+        self.feature_category_list = []
 
     def load_dataset(self,verbose = True):
         if self.dataset_name == 'watermelon_2.0':
@@ -28,7 +29,7 @@ class Dataset:
                                         {'Concave':0,'Hollow':1,'Flat':2},\
                                         {'Smooth':0,'Stick':1}]
             self.feature2number_mapping = feature2number_mapping
-
+            self.feature_category_list = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0)]
             feature_name_list = list(df.columns.values)
             self.feature_name_list = feature_name_list
 
@@ -72,7 +73,7 @@ class Dataset:
                                         {},\
                                         {}]
             self.feature2number_mapping = feature2number_mapping
-
+            self.feature_category_list = [(0,0),(1,0),(2,0),(3,0),(4,0),(5,0),(6,1),(7,1)]
             feature_name_list = list(df.columns.values)
             self.feature_name_list = feature_name_list
 
@@ -113,7 +114,7 @@ class Dataset:
                                         {'False':0,'True':1},\
                                         ]
             self.feature2number_mapping = feature2number_mapping
-
+            self.feature_category_list = [(0,0),(1,0),(2,0),(3,0)]
             feature_name_list = list(df.columns.values)
             self.feature_name_list = feature_name_list
 

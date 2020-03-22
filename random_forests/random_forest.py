@@ -23,12 +23,9 @@ class RandomForest():
         for random_selected_training_samples in random_selected_training_samples_list:
             test_decision_tree = DecisionTree()
             test_decision_tree.set_training_samples_root(random_selected_training_samples)
-            # change it later
-            test_decision_tree.set_attributes_list([(0,0),(1,0),(2,0),(3,0),(4,0),(5,0)])
-            decision_tree_root = test_decision_tree.generate_decision_tree(test_decision_tree.training_samples_root,test_decision_tree.attributes_list)
+            test_decision_tree.set_attributes_list(self.dataset.feature_category_list)
+            decision_tree_root = test_decision_tree.generate_decision_tree(test_decision_tree.training_samples_root,test_decision_tree.attributes_list,random_state=1)
             test_decision_tree.set_root(decision_tree_root)
             self.forest.append(test_decision_tree)
-            # test_vis_tree = VisTree(test_decision_tree,self.dataset.feature2number_mapping,\
-            #     self.dataset.feature_name_list,_tree_name="test_decision_tree")
-            # test_vis_tree.vis_tree(mode=1)
+
 

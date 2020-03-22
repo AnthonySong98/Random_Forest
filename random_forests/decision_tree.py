@@ -63,7 +63,7 @@ class DecisionTree:
                     _attributes_list_cp = _attributes_list[:]
                     _attributes_list_cp.remove(best_attribute_to_split)
                     tree_node.add_child_node_criterion(possible_value)
-                    tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp))
+                    tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp,random_state = random_state))
         
         else:
             attribute_values_samples_mapping_dict = tree_node.split_by_attribute_internal(best_attribute_to_split)
@@ -78,7 +78,7 @@ class DecisionTree:
                     _attributes_list_cp = _attributes_list[:]
                     _attributes_list_cp.remove(best_attribute_to_split)
                     tree_node.add_child_node_criterion(possible_criterion_value)
-                    tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp))
+                    tree_node.add_child_node(self.generate_decision_tree(sub_training_samples,_attributes_list_cp,random_state = random_state))
 
         return tree_node
 
