@@ -66,6 +66,8 @@ class TreeNode:
         '''
         calculate Ent
         '''
+        if _t_samples is None:
+            return 0
         helper_cnt = Counter(_t_samples[:,-1].tolist())
         total_num_samples = _t_samples.shape[0]
         ent_sum = 0
@@ -89,7 +91,10 @@ class TreeNode:
         if _potential_attribute[1] == 1:
             A = list(set((self.samples[:,_potential_attribute[0]]).tolist()))
             A.sort()
-            T_a = [(A[i] + A[i+1]) / 2.0  for i in range(len(A)-1)]
+            if len(A) == 1:
+                T_a = A
+            else:
+                T_a = [(A[i] + A[i+1]) / 2.0  for i in range(len(A)-1)]
             potential_split_value_dict_list = []
             potential_split_value_dict = {}
             for split_value in T_a:
@@ -115,8 +120,16 @@ class TreeNode:
                             D_plus = np.concatenate((D_plus,self.samples[sample_index,:].reshape(1,-1)),axis=0)
                 potential_split_value_dict[split_value].append(D_minus)
                 potential_split_value_dict[split_value].append(D_plus)
-                Gain_D_a = self.get_ent(self.samples) - (float) (D_minus.shape[0]) / self.samples.shape[0] * self.get_ent(D_minus) \
-                     - (float) (D_plus.shape[0]) / self.samples.shape[0] * self.get_ent(D_plus)
+                if D_minus is None:
+                    D_minus_num = 0
+                else:
+                    D_minus_num = D_minus.shape[0]
+                if D_plus is None:
+                    D_plus_num = 0
+                else:
+                    D_plus_num = D_plus.shape[0]
+                Gain_D_a = self.get_ent(self.samples) - (float) (D_minus_num) / self.samples.shape[0] * self.get_ent(D_minus) \
+                     - (float) (D_plus_num) / self.samples.shape[0] * self.get_ent(D_plus)
                 potential_split_value_dict[split_value].append(Gain_D_a)
                 # potential_split_value_dict_list.append(potential_split_value_dict)
 
@@ -154,7 +167,10 @@ class TreeNode:
             sum_ent = 0
             for subsamples_key in subsamples_list:
                 subsamples = subsamples_list[subsamples_key]
-                num_subsamples = subsamples.shape[0]
+                if subsamples is None:
+                    num_subsamples = 0
+                else:
+                    num_subsamples = subsamples.shape[0]
                 num_samples = self.samples.shape[0]
                 sum_ent += (float) (num_subsamples) / num_samples * self.get_ent(subsamples)
             information_gain_on_attribute = self.get_ent(self.samples) - sum_ent

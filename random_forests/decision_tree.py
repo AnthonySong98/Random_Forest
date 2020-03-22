@@ -72,7 +72,7 @@ class DecisionTree:
 
                 sub_training_samples = attribute_values_samples_mapping_dict[possible_criterion_value]
 
-                if sub_training_samples.shape[0] == 0:
+                if sub_training_samples is None or sub_training_samples.shape[0] == 0:
                     return None
                 else:
                     _attributes_list_cp = _attributes_list[:]
@@ -103,7 +103,8 @@ class DecisionTree:
             if child_node_index != -1:
                 current_tree_node = current_tree_node.child_node_list[child_node_index]
             else:
-                print("No satisfied criterion is found in tree node!")
+                # print("No satisfied criterion is found in tree node!")
+                break
         return current_tree_node.category
 
 
