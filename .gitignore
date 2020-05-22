@@ -3,3 +3,5 @@
 .vscode/
 vis/pdf_files/
 vis/dot_files/
+datasets/blood_donation/
+random_forests_sklearn/res/
