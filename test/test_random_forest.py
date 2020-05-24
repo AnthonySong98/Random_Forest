@@ -35,21 +35,25 @@ class TestRandomForest(unittest.TestCase):
         #     test_vis_tree.vis_tree(mode=1)
         #     i += 1
 
-    @unittest.skip("skip test_random_forest_3")
+    # @unittest.skip("skip test_random_forest_3")
     def test_random_forest_3(self):
         test_dataset = Dataset(_dataset_name = 'uci_blood', _dataset_file_path = './datasets/uci_blood.csv')
         test_dataset.load_dataset(verbose=False)
         
         test_random_forest = RandomForest(n_estimators = 20,n_samples=400)
         test_random_forest.set_dataset(test_dataset)
+        import time 
+        start = time.clock()
         test_random_forest.generate_random_forest()
-        # i = 0
-        # for tree in test_random_forest.forest:
-        #     test_vis_tree = VisTree(tree,test_dataset.feature2number_mapping,\
-        #         test_dataset.feature_name_list,_tree_name="test_3_random_decision_tree_%d" %(i))
-        #     test_vis_tree.vis_tree(mode=1)
-        #     i += 1
-
+        end = time.clock()
+        print((end-start)/20.0)
+        """ i = 0
+        for tree in test_random_forest.forest:
+            test_vis_tree = VisTree(tree,test_dataset.feature2number_mapping,\
+                test_dataset.feature_name_list,_tree_name="test_3_random_decision_tree_%d" %(i))
+            test_vis_tree.vis_tree(mode=1)
+            i += 1
+ """
         print(test_random_forest.calculate_out_of_bag_error())
 
     @unittest.skip("skip test_random_forest_predict")

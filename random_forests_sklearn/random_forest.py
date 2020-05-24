@@ -32,6 +32,10 @@ def get_roc_curve():
             print(dataset_path)
             print(dataset_name)
 
+            if dataset_name != '2016-04-08' and dataset_name != '2016-04-18' and dataset_name != '2016-04-28' and dataset_name != '2016-05-20' and dataset_name != '2016-05-21' and dataset_name != '2016-06-04'\
+                and dataset_name != '2016-06-12':
+                continue
+            
             raw_data = np.load(dataset_path)
             X = raw_data['arr_0']
             y = raw_data['arr_1']
@@ -44,52 +48,6 @@ def get_roc_curve():
                 total_y = np.concatenate((total_y,y))
             
             cnt += 1
-
-            X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=42)
-
-            ax = plt.gca()
-
-            # RandomForestClassifier
-            RF_clf = RandomForestClassifier(n_estimators = 100, criterion="entropy",oob_score=True)
-            RF_clf = RF_clf.fit(X_train,y_train)
-
-            # DecisionTreeClassifier
-            DT_clf = DecisionTreeClassifier(criterion='entropy')
-            DT_clf = DT_clf.fit(X_train,y_train)
-
-            # BaggingClassifier
-            BAG_clf = BaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy'),\
-                n_estimators=100,oob_score=True)
-            BAG_clf = BAG_clf.fit(X_train,y_train)
-
-            # AdaBoostClassifier
-            ADB_clf = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy'),\
-                n_estimators=100)
-            ADB_clf = ADB_clf.fit(X_train,y_train)
-
-            # GradientBoostingClassifier
-            GB_clf = GradientBoostingClassifier(n_estimators=100)
-            GB_clf = GB_clf.fit(X_train,y_train)
-
-            
-            rfc_disp = plot_roc_curve(RF_clf, X_test, y_test, ax=ax)
-            dtc_disp = plot_roc_curve(DT_clf, X_test, y_test, ax=ax)
-            bag_disp = plot_roc_curve(BAG_clf, X_test, y_test, ax=ax)
-            adb_disp = plot_roc_curve(ADB_clf, X_test, y_test, ax=ax)
-            gb_disp = plot_roc_curve(GB_clf, X_test, y_test, ax=ax)
-
-
-            # rfc_disp.plot(ax=ax, alpha=0.8)
-            # plt.show()
-
-            plt.savefig("random_forests_sklearn/res/"+ dataset_name +".pdf")
-            plt.close()
-
-            print("For "+dataset_name+ " ...")
-            print("RandomForestClassifier ",RF_clf.oob_score_)
-            print("BaggingClassifier ",BAG_clf.oob_score_)
-
-
 
     X_train, X_test, y_train, y_test = train_test_split(total_X, total_y, random_state=42)
 
@@ -117,22 +75,126 @@ def get_roc_curve():
     GB_clf = GradientBoostingClassifier(n_estimators=100)
     GB_clf = GB_clf.fit(X_train,y_train)
 
-
+    
     rfc_disp = plot_roc_curve(RF_clf, X_test, y_test, ax=ax)
     dtc_disp = plot_roc_curve(DT_clf, X_test, y_test, ax=ax)
     bag_disp = plot_roc_curve(BAG_clf, X_test, y_test, ax=ax)
     adb_disp = plot_roc_curve(ADB_clf, X_test, y_test, ax=ax)
     gb_disp = plot_roc_curve(GB_clf, X_test, y_test, ax=ax)
 
+
     # rfc_disp.plot(ax=ax, alpha=0.8)
     # plt.show()
 
-    plt.savefig("random_forests_sklearn/res/"+ "whole" +".pdf")
+    plt.savefig("random_forests_sklearn/res/"+ dataset_name +"_2.pdf")
     plt.close()
 
-    print("For "+ " whole "+ " ...")
+    print("For "+dataset_name+ " ...")
     print("RandomForestClassifier ",RF_clf.oob_score_)
     print("BaggingClassifier ",BAG_clf.oob_score_)
+
+    from sklearn.model_selection import cross_val_score
+    import statistics
+
+    print("RF")
+    aver_list = cross_val_score(RF_clf, total_X, total_y, cv=10, scoring='accuracy')
+    print(aver_list)
+    print(statistics.mean(aver_list))
+    print(statistics.stdev(aver_list))
+
+    f1_list = cross_val_score(RF_clf, total_X, total_y, cv=10, scoring='f1')
+    print(f1_list)
+    print(statistics.mean(f1_list))
+    print(statistics.stdev(f1_list))
+
+    print("DT")
+    aver_list = cross_val_score(DT_clf, total_X, total_y, cv=10, scoring='accuracy')
+    print(aver_list)
+    print(statistics.mean(aver_list))
+    print(statistics.stdev(aver_list))
+
+    f1_list = cross_val_score(DT_clf, total_X, total_y, cv=10, scoring='f1')
+    print(f1_list)
+    print(statistics.mean(f1_list))
+    print(statistics.stdev(f1_list))
+
+    print("BAG_clf")
+    aver_list = cross_val_score(BAG_clf, total_X, total_y, cv=10, scoring='accuracy')
+    print(aver_list)
+    print(statistics.mean(aver_list))
+    print(statistics.stdev(aver_list))
+
+    f1_list = cross_val_score(BAG_clf, total_X, total_y, cv=10, scoring='f1')
+    print(f1_list)
+    print(statistics.mean(f1_list))
+    print(statistics.stdev(f1_list))
+
+
+    print("ADB_clf")
+    aver_list = cross_val_score(ADB_clf, total_X, total_y, cv=10, scoring='accuracy')
+    print(aver_list)
+    print(statistics.mean(aver_list))
+    print(statistics.stdev(aver_list))
+
+    f1_list = cross_val_score(ADB_clf, total_X, total_y, cv=10, scoring='f1')
+    print(f1_list)
+    print(statistics.mean(f1_list))
+    print(statistics.stdev(f1_list))
+    
+
+    print("GB_clf")
+    aver_list = cross_val_score(GB_clf, total_X, total_y, cv=10, scoring='accuracy')
+    print(aver_list)
+    print(statistics.mean(aver_list))
+    print(statistics.stdev(aver_list))
+
+    f1_list = cross_val_score(GB_clf, total_X, total_y, cv=10, scoring='f1')
+    print(f1_list)
+    print(statistics.mean(f1_list))
+    print(statistics.stdev(f1_list))
+
+    # X_train, X_test, y_train, y_test = train_test_split(total_X, total_y, random_state=42)
+
+    # ax = plt.gca()
+
+    # # RandomForestClassifier
+    # RF_clf = RandomForestClassifier(n_estimators = 100, criterion="entropy",oob_score=True)
+    # RF_clf = RF_clf.fit(X_train,y_train)
+
+    # # DecisionTreeClassifier
+    # DT_clf = DecisionTreeClassifier(criterion='entropy')
+    # DT_clf = DT_clf.fit(X_train,y_train)
+
+    # # BaggingClassifier
+    # BAG_clf = BaggingClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy'),\
+    #     n_estimators=100,oob_score=True)
+    # BAG_clf = BAG_clf.fit(X_train,y_train)
+
+    # # AdaBoostClassifier
+    # ADB_clf = AdaBoostClassifier(base_estimator=DecisionTreeClassifier(criterion='entropy'),\
+    #     n_estimators=100)
+    # ADB_clf = ADB_clf.fit(X_train,y_train)
+
+    # # GradientBoostingClassifier
+    # GB_clf = GradientBoostingClassifier(n_estimators=100)
+    # GB_clf = GB_clf.fit(X_train,y_train)
+
+
+    # rfc_disp = plot_roc_curve(RF_clf, X_test, y_test, ax=ax)
+    # dtc_disp = plot_roc_curve(DT_clf, X_test, y_test, ax=ax)
+    # bag_disp = plot_roc_curve(BAG_clf, X_test, y_test, ax=ax)
+    # adb_disp = plot_roc_curve(ADB_clf, X_test, y_test, ax=ax)
+    # gb_disp = plot_roc_curve(GB_clf, X_test, y_test, ax=ax)
+
+    # # rfc_disp.plot(ax=ax, alpha=0.8)
+    # # plt.show()
+
+    # plt.savefig("random_forests_sklearn/res/"+ "whole" +".pdf")
+    # plt.close()
+
+    # print("For "+ " whole "+ " ...")
+    # print("RandomForestClassifier ",RF_clf.oob_score_)
+    # print("BaggingClassifier ",BAG_clf.oob_score_)
 
 
 def tune_hyper_parameter():
@@ -278,7 +340,8 @@ def tune_hyper_parameter():
 
 
 def main():
-    tune_hyper_parameter()
+    # tune_hyper_parameter()
+    get_roc_curve()
 
 
 if __name__ == "__main__":
